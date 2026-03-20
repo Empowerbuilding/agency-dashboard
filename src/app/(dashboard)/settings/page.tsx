@@ -1,18 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Facebook, CheckCircle, AlertCircle, ExternalLink } from "lucide-react";
 import { clients } from "@/lib/mock-data";
 import { getFacebookLoginUrl } from "@/lib/facebook";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function SettingsPage() {
+function SettingsContent() {
   const [connecting, setConnecting] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("connected") === "true") {
+      setConnected(true);
+    }
+  }, [searchParams]);
 
   function handleConnectFacebook() {
     setConnecting(true);
     const url = getFacebookLoginUrl();
-    window.open(url, "_blank", "width=600,height=700");
-    setTimeout(() => setConnecting(false), 3000);
+    window.location.href = url;
   }
 
   return (
@@ -37,15 +46,34 @@ export default function SettingsPage() {
             </p>
           </div>
         </div>
-        <button
-          onClick={handleConnectFacebook}
-          disabled={connecting}
-          className="flex items-center gap-2 px-4 py-2.5 bg-[#1877F2] text-white rounded-lg text-sm font-medium hover:bg-[#166FE5] transition-colors disabled:opacity-50"
-        >
-          <Facebook size={16} />
-          {connecting ? "Connecting..." : "Connect with Facebook"}
-          <ExternalLink size={14} />
-        </button>
+
+        {connected ? (
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm font-medium">
+              <CheckCircle size={16} />
+              Connected to Facebook
+            </div>
+            <button
+              onClick={() => {
+                setConnected(false);
+                handleConnectFacebook();
+              }}
+              className="text-sm text-gray-500 underline hover:text-gray-700"
+            >
+              Reconnect
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={handleConnectFacebook}
+            disabled={connecting}
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#1877F2] text-white rounded-lg text-sm font-medium hover:bg-[#166FE5] transition-colors disabled:opacity-50"
+          >
+            <Facebook size={16} />
+            {connecting ? "Connecting..." : "Connect with Facebook"}
+            <ExternalLink size={14} />
+          </button>
+        )}
       </div>
 
       {/* Connected Pages */}
@@ -92,5 +120,13 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SettingsContent />
+    </Suspense>
   );
 }
