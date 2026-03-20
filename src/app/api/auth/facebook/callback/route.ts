@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
       else { window.location.href = '${APP_URL}/settings?connected=true'; }
     </script></body></html>`, { headers: { 'Content-Type': 'text/html' } });
 
-  } catch (e) {
+  } catch {
     return new NextResponse(`<html><body><script>
       if (window.opener) { window.opener.postMessage({type:'fb_auth',success:false,error:'callback_failed'}, '*'); window.close(); }
       else { window.location.href = '${APP_URL}/settings?error=callback_failed'; }
