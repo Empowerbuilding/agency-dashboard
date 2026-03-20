@@ -14,6 +14,8 @@ export function getFacebookLoginUrl() {
     "ads_read",
     "leads_retrieval",
     "pages_show_list",
+    "business_management",
+    "pages_manage_ads",
   ].join(",");
 
   return `https://www.facebook.com/v19.0/dialog/oauth?client_id=${FB_APP_ID}&redirect_uri=${encodeURIComponent(FB_REDIRECT_URI)}&scope=${scopes}&response_type=code&auth_type=rerequest`;
