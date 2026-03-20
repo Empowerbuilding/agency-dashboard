@@ -6,7 +6,10 @@ export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
 
   if (!code) {
-    return NextResponse.redirect(new URL("/settings?error=no_code", APP_URL));
+    return new NextResponse(`<html><body><script>
+      if (window.opener) { window.opener.postMessage({type:'fb_auth',success:false,error:'no_code'}, '*'); window.close(); }
+      else { window.location.href = '${APP_URL}/settings?error=no_code'; }
+    </script></body></html>`, { headers: { 'Content-Type': 'text/html' } });
   }
 
   try {
@@ -20,20 +23,22 @@ export async function GET(request: NextRequest) {
     const tokenData = await tokenRes.json();
 
     if (tokenData.error) {
-      console.error("FB token error:", tokenData.error);
-      return NextResponse.redirect(
-        new URL("/settings?error=token_exchange_failed", APP_URL)
-      );
+      return new NextResponse(`<html><body><script>
+        if (window.opener) { window.opener.postMessage({type:'fb_auth',success:false,error:'token_failed'}, '*'); window.close(); }
+        else { window.location.href = '${APP_URL}/settings?error=token_exchange_failed'; }
+      </script></body></html>`, { headers: { 'Content-Type': 'text/html' } });
     }
 
-    // In production, store the access token in Supabase
-    return NextResponse.redirect(
-      new URL("/settings?connected=true", APP_URL)
-    );
+    // Success - close popup and notify parent
+    return new NextResponse(`<html><body><script>
+      if (window.opener) { window.opener.postMessage({type:'fb_auth',success:true}, '*'); window.close(); }
+      else { window.location.href = '${APP_URL}/settings?connected=true'; }
+    </script></body></html>`, { headers: { 'Content-Type': 'text/html' } });
+
   } catch (e) {
-    console.error("FB callback error:", e);
-    return NextResponse.redirect(
-      new URL("/settings?error=callback_failed", APP_URL)
-    );
+    return new NextResponse(`<html><body><script>
+      if (window.opener) { window.opener.postMessage({type:'fb_auth',success:false,error:'callback_failed'}, '*'); window.close(); }
+      else { window.location.href = '${APP_URL}/settings?error=callback_failed'; }
+    </script></body></html>`, { headers: { 'Content-Type': 'text/html' } });
   }
 }
