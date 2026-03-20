@@ -16,7 +16,7 @@ export function getFacebookLoginUrl() {
     "pages_show_list",
   ].join(",");
 
-  return `https://www.facebook.com/v19.0/dialog/oauth?client_id=${FB_APP_ID}&redirect_uri=${encodeURIComponent(FB_REDIRECT_URI)}&scope=${scopes}&response_type=code`;
+  return `https://www.facebook.com/v19.0/dialog/oauth?client_id=${FB_APP_ID}&redirect_uri=${encodeURIComponent(FB_REDIRECT_URI)}&scope=${scopes}&response_type=code&auth_type=rerequest`;
 }
 
 export async function fetchFromFacebook(
