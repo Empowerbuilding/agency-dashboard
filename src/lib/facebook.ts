@@ -1,6 +1,8 @@
 const FB_APP_ID = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID!;
 const FB_REDIRECT_URI =
-  typeof window !== "undefined"
+  process.env.NEXT_PUBLIC_APP_URL
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/facebook/callback`
+    : typeof window !== "undefined"
     ? `${window.location.origin}/api/auth/facebook/callback`
     : "";
 
